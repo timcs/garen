@@ -1,0 +1,17 @@
+server:
+  port: 58080
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: garen-server
+  datasource:
+    url: jdbc:mysql://localhost:3306/garen
+    username: root
+    password: 1qaz@WSX
+
+logging:
+  level:
+    #    top.binaryx.veigar.mapper: DEBUG
+    root: INFO
