@@ -1,6 +1,5 @@
-package top.binaryx.garen.server.pojo.entity;
+package top.binaryx.garen.server.pojo.dto;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -8,10 +7,9 @@ import top.binaryx.garen.server.common.BaseTableAttr;
 
 
 @Data
-@TableName("job_config")
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class JobConfigDO extends BaseTableAttr {
+public class JobConfigDTO extends BaseTableAttr {
 
 
     private String jobName;
@@ -41,4 +39,5 @@ public class JobConfigDO extends BaseTableAttr {
 
 
     private Integer status;
+
 }
