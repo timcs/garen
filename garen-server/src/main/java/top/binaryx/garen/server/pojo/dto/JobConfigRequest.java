@@ -21,14 +21,9 @@ public class JobConfigRequest {
     private String executorIp;
     private Integer status;
     private String creator;
-
-
     private String modifier;
 
-
     private LocalDateTime createTime;
-
-
     private LocalDateTime modifiedTime;
 
     private Long pageNum = 0L;
