@@ -17,16 +17,12 @@ package top.binaryx.garen.server.listener;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
-import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.leader.LeaderLatchListener;
-import top.binaryx.garen.common.util.CacheUtil;
 import top.binaryx.garen.server.component.LeaderHandler;
 import top.binaryx.garen.server.component.SpringContextHolder;
 import top.binaryx.garen.server.service.ZookeeperService;
 
 /**
- * TODO 类实现描述
- *
  * @author weihongtian
  * @version v0.1 2019-07-04 15:40 weihongtian Exp $
  */
@@ -36,42 +32,24 @@ public class LeaderChangedLatchListener implements LeaderLatchListener {
     private final LeaderHandler leaderHandler = SpringContextHolder.getBean(LeaderHandler.class);
     private final ZookeeperService zookeeperService = SpringContextHolder.getBean(ZookeeperService.class);
 
-    GroupAddListener groupAddListener = new GroupAddListener();
-    GroupRemoveListener groupRemoveListener = new GroupRemoveListener();
-    JobConfigListener jobConfigListener = new JobConfigListener();
-    OwnerLostListener ownerLostListener = new OwnerLostListener();
-
     @Override
     public void isLeader() {
         log.info("become leader server.");
+        //成为leader 监听ip节点,给任务分配调度器
+        //监听 /server/ip节点
+        PathChildrenCache childrenCache = zookeeperService.getServerIpPathCache();
+        childrenCache.getListenable().addListener(new ServerChangedListener());
 
         try {
             leaderHandler.migrateGroups();
         } catch (Exception e) {
             log.error("leader migrate group error.");
         }
-
-        //监听
-        PathChildrenCache childrenCache = zookeeperService.getServerIpPathCache();
-        childrenCache.getListenable().addListener(new ServerChangeListener());
-
-        TreeCache groupsTreeCache = zookeeperService.getGroupsTreeCache();
-
-        groupsTreeCache.getListenable().addListener(groupAddListener);
-        groupsTreeCache.getListenable().addListener(groupRemoveListener);
-        groupsTreeCache.getListenable().addListener(jobConfigListener);
-        groupsTreeCache.getListenable().addListener(ownerLostListener);
     }
 
     @Override
     public void notLeader() {
         log.info("become follower server.");
-        CacheUtil.getServerCache().cleanUp();
-
         zookeeperService.getServerIpPathCache().getListenable().clear();
-        zookeeperService.getGroupsTreeCache().getListenable().removeListener(groupAddListener);
-        zookeeperService.getGroupsTreeCache().getListenable().removeListener(groupRemoveListener);
-        zookeeperService.getGroupsTreeCache().getListenable().removeListener(jobConfigListener);
-        zookeeperService.getGroupsTreeCache().getListenable().removeListener(ownerLostListener);
     }
 }

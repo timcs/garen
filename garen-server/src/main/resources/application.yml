@@ -1,5 +1,5 @@
 server:
-  port: 10323
+  port: 3239
 
 spring:
   profiles:
@@ -10,7 +10,6 @@ spring:
     url: jdbc:mysql://localhost:3306/garen
     username: root
     password: 1qaz@WSX
-#top.binaryx.garen.server
 logging:
   level:
     top.binaryx.garen.server.mapper: DEBUG
