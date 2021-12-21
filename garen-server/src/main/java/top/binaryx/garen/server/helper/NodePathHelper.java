@@ -1,34 +1,15 @@
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
 package top.binaryx.garen.server.helper;
 
 import org.apache.commons.lang3.StringUtils;
 
-/**
- * TODO
- *
- * @author weihongtian
- * @version v0.1 2019-09-12 11:31 weihongtian Exp $
- */
+
 public final class NodePathHelper {
     public final static String SERVER_NODE = "/server";
     public final static String SERVER_IP_NODE = "/server/ip";
     public final static String SERVER_IP_FORMAT = "/server/ip/%s";
     public final static String SERVER_IP_REGEX = "/server/ip/((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}";
     public final static String SERVER_LATCH_NODE = "/server/latch";
+    public final static String SERVER_LEADER_NODE = "/server/leader";
 
     public final static String GROUPS_NODE = "/groups";
     public final static String GROUP_NODE = "/groups/%s";
@@ -108,6 +89,14 @@ public final class NodePathHelper {
 
     public static boolean isOwnerNode(String path) {
         return path.matches(OWNER_NODE_REGEX);
+    }
+
+    public static boolean isServerIpNode(String path) {
+        return path.matches(SERVER_IP_REGEX);
+    }
+
+    public static  String  getServerLeaderNode() {
+        return SERVER_LEADER_NODE;
     }
 
 }

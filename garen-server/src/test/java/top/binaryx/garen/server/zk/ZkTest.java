@@ -1,21 +1,13 @@
 package top.binaryx.garen.server.zk;
 
-import lombok.SneakyThrows;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.zookeeper.CreateMode;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
-/**
- * <>
- *
- * @author hongtian.wei
- * @date 2021-12-20 16:33
- * @since
- */
+
 public class ZkTest {
     public static void main(String[] args) throws Exception {
         CuratorFramework client;
@@ -35,15 +27,24 @@ public class ZkTest {
 
         final String path = "/path";
         final String value = "value";
-        client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, value.getBytes(StandardCharsets.UTF_8));
+//        client.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, value.getBytes(StandardCharsets.UTF_8));
 
-        client.getConnectionStateListenable().addListener((client1, newState) -> {
-            System.out.println(newState + ":" + getValue(client, path));
-        });
+//        client.getConnectionStateListenable().addListener((client1, newState) -> {
+//            System.out.println(newState + ":" + getValue(client, path));
+//        });
+
+        while (true) {
+            System.err.println(getValue(client, path));
+            Thread.sleep(1000);
+        }
     }
 
-    @SneakyThrows
     private static String getValue(CuratorFramework client, String path) {
-        return new String(client.getData().forPath(path), StandardCharsets.UTF_8);
+        try {
+            return new String(client.getData().forPath(path), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

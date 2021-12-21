@@ -1,19 +1,28 @@
 package top.binaryx.garen.server.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import top.binaryx.garen.server.pojo.dto.JobConfigDTO;
+import top.binaryx.garen.server.pojo.dto.JobExecLog;
 import top.binaryx.garen.server.pojo.dto.JobExecuteLogDTO;
 
-/**
- * <>
- *
- * @author tim
- * @date 2021-11-15 10:53
- * @since
- */
+import java.util.List;
+
+
 public interface JobLogService {
 
+    int save(JobExecuteLogDTO dto);
+
+    int update(JobExecuteLogDTO dto);
+
+    Integer findCount(JobExecLog dto);
+
+    List<JobExecLog> findByExecuteNo(Long executeNo);
+
+    JobExecLog findById(Long id);
+
+    List<JobExecLog> findPage(JobExecLog dto, Integer pageSize, Integer offset);
+
+    //    void executeHttpCallBack(HttpCallBackRequest request);
     JobExecuteLogDTO queryLog(Long id);
+
     JobExecuteLogDTO queryDetailLog(Long id);
 
 }

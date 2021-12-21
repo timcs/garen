@@ -12,5 +12,7 @@ spring:
     password: 1qaz@WSX
 logging:
   level:
-    top.binaryx.garen.server.mapper: DEBUG
+    top.binaryx.garen.server.mapper: INFO
     root: INFO
+zk:
+  server: 127.0.0.1:2181/garen

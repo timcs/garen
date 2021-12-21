@@ -27,7 +27,7 @@ public class JobConfigController {
     private JobConfigService jobConfigService;
 
     @PutMapping("/add")
-    public ResponseEntity<ResponseEnvelope> add(@RequestBody @Validated JobConfigRequest request) {
+    public ResponseEntity<ResponseEnvelope> add(@RequestBody @Validated JobConfigRequest request) throws Exception {
         JobConfigDTO dto = generateModifyDTO(request);
         jobConfigService.create(dto);
         return ResponseEntity.ok(ResponseEnvelope.success());
@@ -49,7 +49,7 @@ public class JobConfigController {
 
     @GetMapping("/load/{id}")
     public ResponseEntity<ResponseEnvelope<JobConfigVO>> load(@PathVariable Long id) {
-        JobConfigDTO dto = jobConfigService.find(id);
+        JobConfigDTO dto = jobConfigService.findById(id);
         JobConfigVO vo = dto2Vo(dto);
         return ResponseEntity.ok(ResponseEnvelope.success(vo));
     }
@@ -83,6 +83,6 @@ public class JobConfigController {
     }
 
     private JobConfigVO dto2Vo(JobConfigDTO dto) {
-        return MapperUtil.JobConfigMapper.INSTANCE.dto2vo(dto);
+        return MapperUtil.JobConfigPojoMapper.INSTANCE.dto2vo(dto);
     }
 }

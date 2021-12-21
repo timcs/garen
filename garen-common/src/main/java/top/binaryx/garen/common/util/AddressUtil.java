@@ -7,12 +7,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
 
-/**
- * TODO
- *
- * @author weihongtian
- * @version v0.1 2019-09-17 11:23 weihongtian Exp $
- */
+
 public class AddressUtil {
 
     private static volatile String cachedIpAddress;

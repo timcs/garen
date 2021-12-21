@@ -7,9 +7,7 @@ import org.apache.curator.framework.recipes.leader.LeaderLatch;
 
 import java.util.List;
 
-/**
- * zk注册中心服务.
- */
+
 public interface ZookeeperService {
 
     /**

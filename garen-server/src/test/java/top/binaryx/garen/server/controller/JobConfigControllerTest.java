@@ -12,7 +12,6 @@ import top.binaryx.garen.server.mapper.JobConfigMapper;
 import top.binaryx.garen.server.pojo.dto.JobConfigRequest;
 import top.binaryx.garen.server.service.JobConfigService;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
+import top.binaryx.garen.common.util.AddressUtil;
 import top.binaryx.garen.server.common.GarenContext;
 import top.binaryx.garen.server.listener.ConnectionStateChangedListener;
 import top.binaryx.garen.server.service.ZookeeperService;
@@ -14,9 +15,7 @@ import top.binaryx.garen.server.service.ZookeeperService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * @author tim
- */
+
 @Slf4j
 @Component
 public class ServerBootStrap implements ApplicationListener<ContextRefreshedEvent> {
@@ -27,11 +26,13 @@ public class ServerBootStrap implements ApplicationListener<ContextRefreshedEven
     private ZookeeperService zookeeperService;
 
     @Value("${zk.server}")
-    private String zkServer;
+    String zkServer;
+
+    @Value("${server.port}")
+    int serverPort;
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-
         try {
             initParams();
 
@@ -48,7 +49,6 @@ public class ServerBootStrap implements ApplicationListener<ContextRefreshedEven
         } catch (Exception e) {
             log.error("init server error.", e);
         }
-
     }
 
     private void joinLeaderElect() {
@@ -68,16 +68,17 @@ public class ServerBootStrap implements ApplicationListener<ContextRefreshedEven
      * 解析参数
      * 解析zk参数
      */
-    private void initParams() {
+    private void initParams() throws Exception {
         int start = zkServer.lastIndexOf("/");
         if (start >= 0) {
             String namespace = zkServer.substring(start + 1);
             String servers = zkServer.substring(0, start);
             GarenContext.getInstance().setZkNameSpace(namespace);
             GarenContext.getInstance().setZkServer(servers);
-            return;
+        } else {
+            GarenContext.getInstance().setZkServer(zkServer);
         }
-
-        GarenContext.getInstance().setZkServer(zkServer);
+        GarenContext.getInstance().setServerPort(serverPort);
+        GarenContext.getInstance().setServer(AddressUtil.getLocalHost());
     }
 }
