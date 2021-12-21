@@ -1,5 +1,6 @@
 package top.binaryx.garen.server.controller;
 
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import top.binaryx.garen.server.service.ScheduleService;
 import java.util.List;
 
 
+@Api(tags = "任务管理")
 @Slf4j
 @RestController
 @RequestMapping("/admin")

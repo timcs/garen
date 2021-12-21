@@ -3,6 +3,9 @@ package top.binaryx.garen.server.controller;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +21,7 @@ import top.binaryx.garen.server.util.MapperUtil;
 import java.util.List;
 
 
+@Api(tags = "JOB配置")
 @Slf4j
 @RestController
 @RequestMapping("/job/config")
@@ -26,6 +30,7 @@ public class JobConfigController {
     @Autowired
     private JobConfigService jobConfigService;
 
+    @ApiOperation(value = "新增任务", notes = "入库并加入分配调度引擎")
     @PutMapping("/add")
     public ResponseEntity<ResponseEnvelope> add(@RequestBody @Validated JobConfigRequest request) throws Exception {
         JobConfigDTO dto = generateModifyDTO(request);
