@@ -19,7 +19,7 @@ import top.binaryx.garen.server.service.ScheduleService;
 import java.util.List;
 
 
-@Api(tags = "任务管理")
+@Api(tags = "JOB管理")
 @Slf4j
 @RestController
 @RequestMapping("/admin")
@@ -40,6 +40,12 @@ public class ServerAdminController {
         List<Long> result = migrateService.migrate(request);
         response.setJobIds(result);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/scheduler/shutdown")
+    public ResponseEntity shutDownScheduler() throws Exception {
+        scheduleService.shutDownScheduler();
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/job/ops")

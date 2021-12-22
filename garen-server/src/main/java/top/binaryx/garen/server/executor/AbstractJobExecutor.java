@@ -17,6 +17,7 @@ public abstract class AbstractJobExecutor implements JobExecutor {
     protected JobExecuteLogDTO buildLog(JobConfigDTO configDTO) throws Exception {
         JobExecuteLogDTO dto = new JobExecuteLogDTO();
         dto.setExecuteNo(IdWorker.getExecuteNo());
+        dto.setExecutorIp(configDTO.getExecutorIp());
         dto.setJobId(configDTO.getId());
         dto.setTargetAddress(configDTO.getTargetAddress());
         dto.setStartTime(LocalDateTime.now());

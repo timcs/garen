@@ -25,4 +25,6 @@ public interface ScheduleService {
     Scheduler getScheduler();
 
     void shutDownScheduler(Scheduler scheduler);
+
+    void shutDownScheduler();
 }

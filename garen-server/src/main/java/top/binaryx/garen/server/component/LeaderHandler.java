@@ -1,13 +1,13 @@
 package top.binaryx.garen.server.component;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +32,8 @@ import java.util.stream.Collectors;
 @Component
 public class LeaderHandler {
 
-    private List<Long> toMigrateJobs = Lists.newArrayList();
-    private static final Cache<String, List<Long>> jobLoadCache = CacheBuilder.newBuilder().maximumSize(5).build();
+    private static List<Long> toMigrateJobs = Lists.newArrayList();
+    private static final Map<String, List<Long>> jobLoadCache = new LinkedHashMap<>();
 
     @Autowired
     ZookeeperService zookeeperService;
@@ -49,24 +49,25 @@ public class LeaderHandler {
      * 4、计算每台服务器平均应该接管的任务
      * 5、通知超载服务器释放任务
      */
-    public void migrateJobs() throws Exception {
+    public synchronized void migrateJobs() throws Exception {
+        log.info("start migrateJob");
         List<String> servers = zookeeperService.getChildrenKeys(NodePathHelper.getServerIpNode());
         Map<String, List<Long>> maps = getJobLoad();
-        if (maps.isEmpty()) {
-            return;
-        }
 
         int total = maps.values().stream().mapToInt(List::size).reduce(0, Integer::sum);
-        int avg = Math.floorDiv(total, servers.size());
+        int avg = (int) Math.ceil((double) total / servers.size());
+
+        handleDieAway(maps, servers);
 
         //移除未被接管的任务
-        toMigrateJobs.addAll(maps.remove(CharSequenceUtil.EMPTY));
+        List<Long> noServers = maps.remove(CharSequenceUtil.EMPTY);
+        toMigrateJobs.addAll(CollectionUtil.isEmpty(noServers) ? Lists.newArrayList() : noServers);
 
         //maps按照从大到小排序，把新ip加到最后
-        Set<String> collect = maps.keySet();
+        Set<String> collect = Sets.newHashSet(maps.keySet());
         collect.addAll(servers);
 
-        servers.forEach(ip -> {
+        collect.forEach(ip -> {
             List<Long> load = maps.getOrDefault(ip, Lists.newArrayList());
             int size = load.size();
             if (size == avg) {
@@ -74,8 +75,12 @@ public class LeaderHandler {
             }
             String url = String.format(Constant.MIGRATE_URL, ip, GarenContext.getInstance().getServerPort());
             MigrateRequest request = new MigrateRequest();
-            request.setCount(avg - size);//负数代表释放,整数代表接管
+            request.setCount(avg - size);//负数代表释放,正数代表接管
             request.setJobIds(request.getCount() > 0 ? toMigrateJobs : null);
+            //没有足够的待迁移任务
+            if (request.getCount() > 0 && toMigrateJobs.isEmpty()) {
+                return;
+            }
 
             HttpResponse httpResponse = HttpUtil.createPost(url).body(new Gson().toJson(request)).execute();
             MigrateResponse response = new Gson().fromJson(httpResponse.body(), MigrateResponse.class);
@@ -84,8 +89,42 @@ public class LeaderHandler {
         });
 
         //清除缓存
-        jobLoadCache.invalidateAll();
+        clearCache();
+        log.info("finish migrateJob");
+    }
+
+    public static void clearCache() {
+        jobLoadCache.clear();
         toMigrateJobs.clear();
+    }
+
+    /**
+     * 移除假死的ip
+     * 查看map中key的数量是否比servers多,多的那个有可能为迁移假死未正常卸载
+     * 1、更新数据库
+     * 2、尝试请求关闭调度器
+     */
+    public void handleDieAway(Map<String, List<Long>> maps, List<String> servers) {
+        Set<String> keySet = Sets.newHashSet(maps.keySet());
+        keySet.removeAll(servers);
+
+        keySet.forEach(ip -> {
+            if (StrUtil.isEmpty(ip)) {
+                return;
+            }
+            jobConfigService.emptyIp(ip);
+            maps.merge(CharSequenceUtil.EMPTY, Lists.newArrayList(), (pre, one) -> {
+                pre.addAll(maps.remove(ip));
+                return pre;
+            });
+            //为避免重复调度,尝试请求释放,不一定请求得通
+            String url = String.format(Constant.SHUTDOWN_SCHEDULER_URL, ip, GarenContext.getInstance().getServerPort());
+            try {
+                HttpResponse response = HttpUtil.createPost(url).execute();
+            } catch (Exception e) {
+                log.error("execute:{} error.", url, e);
+            }
+        });
     }
 
     /**
@@ -93,11 +132,11 @@ public class LeaderHandler {
      *
      * @return
      */
-    private Map<String, List<Long>> getJobLoad() {
-        if (jobLoadCache.size() == 0) {
+    public Map<String, List<Long>> getJobLoad() {
+        if (jobLoadCache.isEmpty()) {
             buildCache();
         }
-        return jobLoadCache.asMap();
+        return jobLoadCache;
     }
 
     public String getLowerIp() {
@@ -111,30 +150,30 @@ public class LeaderHandler {
      *
      * @return
      */
-    private Cache<String, List<Long>> buildCache() {
+    public Map<String, List<Long>> buildCache() {
         List<JobConfigDTO> jobs = jobConfigService.findAll();
         Map<String, List<Long>> map = Maps.newHashMap();
-        jobs.forEach(jobConfig -> map.compute(StrUtil.nullToDefault(jobConfig.getExecutorIp(), CharSequenceUtil.EMPTY),
-                (k, v) -> {
-                    if (map.containsKey(k)) {
-                        v.add(jobConfig.getId());
-                        return v;
-                    } else {
-                        return Lists.newArrayList(jobConfig.getId());
-                    }
-                }));
+        jobs.forEach(jobConfig -> {
+            String key = StrUtil.nullToDefault(jobConfig.getExecutorIp(), CharSequenceUtil.EMPTY);
+            map.merge(key, Lists.newArrayList(jobConfig.getId()), (pre, current) -> {
+                pre.add(jobConfig.getId());
+                return pre;
+            });
+        });
 
         Map<String, List<Long>> result = map.entrySet().stream()
                 .sorted(Map.Entry.comparingByValue((o1, o2) -> {
                     if (o1.size() > o2.size()) {
-                        return 1;
-                    } else if (o1.size() < o2.size()) {
                         return -1;
+                    } else if (o1.size() < o2.size()) {
+                        return 1;
                     } else {
                         return 0;
                     }
                 })).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
+        result.putIfAbsent(GarenContext.getInstance().getServer(), Lists.newArrayList());
+        jobLoadCache.clear();
         jobLoadCache.putAll(result);
         return jobLoadCache;
     }

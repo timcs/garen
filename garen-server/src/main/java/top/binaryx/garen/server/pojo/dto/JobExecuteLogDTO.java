@@ -18,7 +18,7 @@ public class JobExecuteLogDTO extends BaseTableAttr {
     private LocalDateTime endTime;
     private LocalDateTime nextTime;
 
-    private String executorIP;
+    private String executorIp;
     private String targetAddress;
     private String requestBody;
     private String responseBody;

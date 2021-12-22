@@ -150,4 +150,10 @@ public class ScheduleServiceImpl implements InitializingBean, ScheduleService {
             log.error("shutDownScheduler error", e);
         }
     }
+
+    @Override
+    public void shutDownScheduler() {
+        Scheduler scheduler = getScheduler();
+        shutDownScheduler(scheduler);
+    }
 }

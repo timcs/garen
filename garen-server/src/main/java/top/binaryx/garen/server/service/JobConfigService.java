@@ -19,6 +19,7 @@ public interface JobConfigService {
 
     int updateIp(Long id, String ip);
 
+    int emptyIp(String ip);
 
     Page<JobConfigDTO> find(Long pageNum, Long pageSize, JobConfigDTO dto);
 

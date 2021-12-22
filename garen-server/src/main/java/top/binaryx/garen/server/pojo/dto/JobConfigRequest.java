@@ -3,6 +3,7 @@ package top.binaryx.garen.server.pojo.dto;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import top.binaryx.garen.common.enums.ProtocolTypeEnum;
 
 
 @ApiModel(value = "任务配置请求对象", description = "任务配置增改对象")
@@ -18,7 +19,7 @@ public class JobConfigRequest {
     private Long jobNo;
     private String jobParam;
     private String jobDesc;
-    private Integer protocolType;
+    private ProtocolTypeEnum protocolType;
     private Integer jobType;
     private String cron;
     private String targetAddress;

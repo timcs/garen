@@ -7,9 +7,11 @@ public interface Constant {
 
     String JOB_ID = "jobId";
 
-    String SERVER_URL = "http://%s:%d/server";
+    String SERVER_URL = "http://%s:%d";
 
     String MIGRATE_URL = SERVER_URL + "/admin/migrate";
+
+    String SHUTDOWN_SCHEDULER_URL = SERVER_URL + "/admin/scheduler/shutdown";
 
     String OPTION_URL = SERVER_URL + "/admin/job/ops";
 

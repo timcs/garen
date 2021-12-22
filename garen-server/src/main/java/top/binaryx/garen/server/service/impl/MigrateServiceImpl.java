@@ -37,9 +37,9 @@ public class MigrateServiceImpl implements MigrateService {
     public List<Long> migrate(MigrateRequest request) throws Exception {
         Integer count = request.getCount();
         if (count > 0) {
-            return discard(count);
+            return take(count, request.getJobIds());
         } else {
-            return take(-count, request.getJobIds());
+            return discard(-count);
         }
     }
 

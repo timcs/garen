@@ -1,5 +1,6 @@
 package top.binaryx.garen.server.service.impl;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -108,6 +109,17 @@ public class JobConfigServiceImpl implements JobConfigService {
     }
 
     @Override
+    public int emptyIp(String ip) {
+        QueryWrapper<JobConfigDO> wrapper = new QueryWrapper<>();
+        wrapper.eq("executor_ip", ip);
+
+        JobConfigDO entity = new JobConfigDO();
+        entity.setExecutorIp(CharSequenceUtil.EMPTY);
+
+        return mapper.update(entity, wrapper);
+    }
+
+    @Override
     public JobConfigDTO findById(Long id) {
         JobConfigDO jobConfigDO = mapper.selectById(id);
         return MapperUtil.JobConfigPojoMapper.INSTANCE.do2dto(jobConfigDO);
@@ -149,7 +161,7 @@ public class JobConfigServiceImpl implements JobConfigService {
     @Override
     public List<JobConfigDTO> findByIp(String ip) {
         QueryWrapper<JobConfigDO> wrapper = new QueryWrapper<>();
-        wrapper.eq("executorIp", ip);
+        wrapper.eq("executor_ip", ip);
         return findWithPage(wrapper);
     }
 

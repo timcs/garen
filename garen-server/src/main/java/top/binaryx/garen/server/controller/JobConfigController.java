@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -82,7 +81,16 @@ public class JobConfigController {
 
     private JobConfigDTO generateModifyDTO(JobConfigRequest request) {
         JobConfigDTO dto = new JobConfigDTO();
+        dto.setId(request.getId());
+        dto.setJobNo(request.getJobNo());
         dto.setJobName(StrUtil.trimToNull(request.getJobName()));
+        dto.setJobDesc(request.getJobDesc());
+        dto.setCron(request.getCron());
+        dto.setJobParam(request.getJobParam());
+        dto.setJobType(request.getJobType());
+        dto.setProtocolType(request.getProtocolType().getValue());
+        dto.setTargetAddress(request.getTargetAddress());
+        dto.setDeleted(request.getDeleted());
         dto.setStatus(request.getStatus());
         return dto;
     }
