@@ -20,6 +20,7 @@
 	<modules>
 		<module>garen-common</module>
 		<module>garen-server</module>
+		<module>garen-demo</module>
 	</modules>
 
 	<properties>
