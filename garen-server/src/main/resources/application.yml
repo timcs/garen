@@ -16,3 +16,7 @@ logging:
     root: INFO
 zk:
   server: 127.0.0.1:2181/garen
+
+garen:
+  server:
+    callbackurl: http://localhost:3239/http/callback

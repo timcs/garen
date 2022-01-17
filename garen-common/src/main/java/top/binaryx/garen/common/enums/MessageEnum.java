@@ -28,11 +28,15 @@ public enum MessageEnum {
     }
 
     public static boolean isSuccess(String code) {
-        return SUCCESS.getCode().equalsIgnoreCase(code);
+        return SUCCESS.getCode().equals(code);
     }
 
     public static boolean isFail(String code) {
-        return FAIL.getCode().equalsIgnoreCase(code);
+        return FAIL.getCode().equals(code);
+    }
+
+    public static boolean isPending(String code) {
+        return PENDING.getCode().equals(code);
     }
 
     public String getCode() {

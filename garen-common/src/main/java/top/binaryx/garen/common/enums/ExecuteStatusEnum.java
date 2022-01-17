@@ -31,4 +31,8 @@ public enum ExecuteStatusEnum {
         return null;
     }
 
+    public static boolean isRunning(Integer status) {
+        return RUNNING.getValue() == status;
+    }
+
 }
