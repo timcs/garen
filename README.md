@@ -3,8 +3,8 @@ Garen a high-performance, java based open source distributed scheduling framewor
 
 ##roadmap  
 - [x] leader 未完全迁移导致的job假接管  
-- [ ] 任务触发，暂停，恢复
-- [ ] http异步任务  
+- [x] 任务触发，暂停，恢复
+- [x] http异步任务  
 - [ ] client模式  
 - [ ] 流程任务  
 - [ ] http任务请求和响应适配问题  

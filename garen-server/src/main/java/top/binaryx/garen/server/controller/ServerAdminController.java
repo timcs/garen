@@ -2,6 +2,7 @@ package top.binaryx.garen.server.controller;
 
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,11 +11,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.binaryx.garen.common.enums.JobOpsEnum;
 import top.binaryx.garen.server.component.LeaderHandler;
+import top.binaryx.garen.server.pojo.dto.JobConfigDTO;
 import top.binaryx.garen.server.pojo.dto.JobOptionRequest;
 import top.binaryx.garen.server.pojo.dto.MigrateRequest;
 import top.binaryx.garen.server.pojo.dto.MigrateResponse;
+import top.binaryx.garen.server.service.JobConfigService;
 import top.binaryx.garen.server.service.MigrateService;
 import top.binaryx.garen.server.service.ScheduleService;
+import top.binaryx.garen.server.util.JobStatusUtil;
 
 import java.util.List;
 
@@ -27,10 +31,10 @@ public class ServerAdminController {
 
     @Autowired
     MigrateService migrateService;
-
     @Autowired
     ScheduleService scheduleService;
-
+    @Autowired
+    JobConfigService jobConfigService;
     @Autowired
     LeaderHandler leaderHandler;
 
@@ -65,6 +69,14 @@ public class ServerAdminController {
         if (request.getJobOpsEnum() == JobOpsEnum.RESUME) {
             scheduleService.resumeJob(request.getJobConfigDTO());
         }
+
+        Trigger.TriggerState schedulerStatus = scheduleService.getSchedulerStatus(request.getJobConfigDTO());
+
+        JobConfigDTO update = new JobConfigDTO();
+        update.setId(request.getJobConfigDTO().getId());
+        update.setStatus(JobStatusUtil.fromTriggerState(schedulerStatus));
+        jobConfigService.update(update);
+
         return ResponseEntity.ok().build();
     }
 

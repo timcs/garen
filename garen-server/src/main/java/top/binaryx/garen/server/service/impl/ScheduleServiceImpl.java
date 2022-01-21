@@ -1,5 +1,6 @@
 package top.binaryx.garen.server.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -130,6 +131,12 @@ public class ScheduleServiceImpl implements InitializingBean, ScheduleService {
         JobKey jobKey = JobKey.jobKey(id);
         TriggerKey triggerKey = TriggerKey.triggerKey(id);
 
+        if (StrUtil.isBlank(jobConfigDTO.getCron())) {
+            //触发任务
+            triggerJob(scheduler, triggerKey, jobKey, jobConfigDTO.getId());
+            return;
+        }
+
         if (scheduler.checkExists(jobKey) || scheduler.checkExists(triggerKey)) {
             return;
         }
@@ -138,6 +145,38 @@ public class ScheduleServiceImpl implements InitializingBean, ScheduleService {
             scheduler.triggerJob(jobKey);
             log.info("Trigger job success, jobConfigDTO:{}", jobConfigDTO);
         }
+    }
+
+    private void triggerJob(Scheduler scheduler, TriggerKey triggerKey, JobKey jobKey, Long jobConfigId) throws SchedulerException {
+        if (scheduler.checkExists(jobKey) || scheduler.checkExists(triggerKey)) {
+            scheduler.unscheduleJob(triggerKey);
+            scheduler.deleteJob(jobKey);
+        }
+
+        JobDataMap jobDataMap = new JobDataMap();
+        jobDataMap.put(Constant.JOB_ID, jobConfigId);
+
+        JobDetail jobDetail = JobBuilder.newJob(SpringJob.class)
+                .withIdentity(jobKey)
+                .usingJobData(jobDataMap)
+                .build();
+
+        SimpleScheduleBuilder scheduleBuilder = SimpleScheduleBuilder.simpleSchedule();
+        SimpleTrigger simpleTrigger = TriggerBuilder.newTrigger()
+                .withIdentity(triggerKey)
+                .withSchedule(scheduleBuilder)
+                .startNow()
+                .build();
+
+        scheduler.scheduleJob(jobDetail, simpleTrigger);
+        log.info("trigger job success, id:{}", jobConfigId);
+    }
+
+    @Override
+    public Trigger.TriggerState getSchedulerStatus(JobConfigDTO jobConfigDTO) throws SchedulerException {
+        Scheduler scheduler = getScheduler();
+        TriggerKey triggerKey = TriggerKey.triggerKey(jobConfigDTO.getId().toString());
+        return scheduler.getTriggerState(triggerKey);
     }
 
     @Override
