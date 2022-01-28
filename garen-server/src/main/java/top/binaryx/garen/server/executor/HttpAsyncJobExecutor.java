@@ -62,11 +62,11 @@ public class HttpAsyncJobExecutor extends AbstractJobExecutor implements JobExec
     }
 
     private void execute(JobExecuteContext context) {
-        HttpJobRequest request = new HttpJobRequest();
+        HttpJobRequest<String> request = new HttpJobRequest();
         request.setExecuteId(context.getExecuteLog().getId());
         request.setJobId(context.getJobConfig().getId());
-        request.setJobParam(context.getJobConfig().getJobParam());
-        request.setCallBackUrl(callBackUrl);
+        request.setData(context.getJobConfig().getJobParam());
+        request.setCallbackUrl(callBackUrl);
 
         String url = context.getJobConfig().getTargetAddress();
         String requestBody = new Gson().toJson(request);

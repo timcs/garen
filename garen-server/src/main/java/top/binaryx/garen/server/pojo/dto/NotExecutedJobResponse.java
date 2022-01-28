@@ -4,6 +4,6 @@ import lombok.Data;
 
 
 @Data
-public class HttpJobResponse extends BaseResponse {
-
+public class NotExecutedJobResponse {
+    private Integer count;
 }

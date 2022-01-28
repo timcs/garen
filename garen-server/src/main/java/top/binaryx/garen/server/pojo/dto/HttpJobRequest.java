@@ -4,9 +4,6 @@ import lombok.Data;
 
 
 @Data
-public class HttpJobRequest {
-    private Long executeId;
-    private Long jobId;
-    private String jobParam;
-    private String callBackUrl;
+public class HttpJobRequest<T> extends BaseRequest<T> {
+    private String callbackUrl;
 }

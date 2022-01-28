@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.binaryx.garen.common.enums.JobOpsEnum;
+import top.binaryx.garen.common.enums.JobStatusEnum;
 import top.binaryx.garen.server.component.LeaderHandler;
 import top.binaryx.garen.server.pojo.dto.JobConfigDTO;
 import top.binaryx.garen.server.pojo.dto.JobOptionRequest;
@@ -18,7 +19,6 @@ import top.binaryx.garen.server.pojo.dto.MigrateResponse;
 import top.binaryx.garen.server.service.JobConfigService;
 import top.binaryx.garen.server.service.MigrateService;
 import top.binaryx.garen.server.service.ScheduleService;
-import top.binaryx.garen.server.util.JobStatusUtil;
 
 import java.util.List;
 
@@ -74,7 +74,7 @@ public class ServerAdminController {
 
         JobConfigDTO update = new JobConfigDTO();
         update.setId(request.getJobConfigDTO().getId());
-        update.setStatus(JobStatusUtil.fromTriggerState(schedulerStatus));
+        update.setStatus(JobStatusEnum.fromTriggerState(schedulerStatus));
         jobConfigService.update(update);
 
         return ResponseEntity.ok().build();

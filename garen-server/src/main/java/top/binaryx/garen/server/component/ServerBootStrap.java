@@ -33,6 +33,9 @@ public class ServerBootStrap implements ApplicationListener<ContextRefreshedEven
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        if (true) {
+            return;
+        }
         try {
             initParams();
 

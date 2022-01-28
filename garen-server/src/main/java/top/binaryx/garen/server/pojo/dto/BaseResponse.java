@@ -4,7 +4,8 @@ import lombok.Data;
 
 
 @Data
-public class BaseResponse {
+public class BaseResponse<T> {
     private String code;
     private String desc;
+    private T data;
 }

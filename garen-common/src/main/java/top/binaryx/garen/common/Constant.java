@@ -23,4 +23,5 @@ public interface Constant {
 
     String ZK_NAMESPACE = "garen";
 
+    int PAGE_SIZE = 1;
 }

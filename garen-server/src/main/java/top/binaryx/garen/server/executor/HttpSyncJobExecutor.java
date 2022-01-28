@@ -58,10 +58,10 @@ public class HttpSyncJobExecutor extends AbstractJobExecutor implements JobExecu
     }
 
     private void execute(JobExecuteContext context) {
-        HttpJobRequest request = new HttpJobRequest();
+        HttpJobRequest<String> request = new HttpJobRequest();
         request.setExecuteId(context.getExecuteLog().getId());
         request.setJobId(context.getJobConfig().getId());
-        request.setJobParam(context.getJobConfig().getJobParam());
+        request.setData(context.getJobConfig().getJobParam());
 
         //请求服务
         String url = context.getJobConfig().getTargetAddress();

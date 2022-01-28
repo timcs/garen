@@ -99,4 +99,8 @@ public final class NodePathHelper {
         return SERVER_LEADER_NODE;
     }
 
+    public static String getAdminConfigPath(final String configName) {
+        return String.format("/admin/config/%s", configName);
+    }
+
 }

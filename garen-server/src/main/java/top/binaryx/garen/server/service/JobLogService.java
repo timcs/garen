@@ -1,9 +1,11 @@
 package top.binaryx.garen.server.service;
 
-import top.binaryx.garen.server.pojo.dto.JobExecLog;
-import top.binaryx.garen.server.pojo.dto.JobExecuteLogDTO;
+import io.swagger.models.auth.In;
+import top.binaryx.garen.server.pojo.dto.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 
 public interface JobLogService {
@@ -25,4 +27,7 @@ public interface JobLogService {
 
     JobExecuteLogDTO queryDetailLog(Long id);
 
+    List<NotExecutedJobDTO> selectNotExecutedJobs(LocalDateTime startTime, LocalDateTime endTime);
+
+    List<RepeatExecutedJobDTO> selectRepeatExecutedJobs(LocalDateTime startTime, LocalDateTime endTime);
 }

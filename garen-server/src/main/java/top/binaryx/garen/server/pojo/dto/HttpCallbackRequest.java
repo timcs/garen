@@ -4,11 +4,7 @@ import lombok.Data;
 
 
 @Data
-public class HttpCallbackRequest {
-    private Long executeId;
-    private Long jobId;
-
-    private Integer resultCode;
-    private String resultMsg;
-    private String resultData;
+public class HttpCallbackRequest extends BaseRequest<String> {
+    private String code;
+    private String desc;
 }

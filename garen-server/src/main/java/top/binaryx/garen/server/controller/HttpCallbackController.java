@@ -60,8 +60,8 @@ public class HttpCallbackController {
         JobExecuteLogDTO update = new JobExecuteLogDTO();
         update.setId(jobExecLog.getId());
         update.setEndTime(LocalDateTime.now());
-        update.setResponseBody(request.getResultMsg());
-        update.setMemo(request.getResultData());
+        update.setResponseBody(request.getData());
+        update.setMemo(request.getDesc());
 
         if (MessageEnum.isSuccess(response.getCode())) {
             update.setStatus(ExecuteStatusEnum.SUCCESS.getValue());
