@@ -21,7 +21,8 @@
 		<module>garen-common</module>
 		<module>garen-server</module>
 		<module>garen-demo</module>
-	</modules>
+        <module>garen-client</module>
+    </modules>
 
 	<properties>
 		<java.version>1.8</java.version>

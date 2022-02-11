@@ -11,19 +11,18 @@ import top.binaryx.garen.common.util.AddressUtil;
 import top.binaryx.garen.server.common.GarenContext;
 import top.binaryx.garen.server.listener.ConnectionStateChangedListener;
 import top.binaryx.garen.server.service.ZookeeperService;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import top.binaryx.garen.server.util.ThreadUtil;
 
 
 @Slf4j
 @Component
 public class ServerBootStrap implements ApplicationListener<ContextRefreshedEvent> {
 
-    private final static ExecutorService executor = Executors.newSingleThreadExecutor();
-
     @Autowired
     private ZookeeperService zookeeperService;
+
+    @Autowired
+    private GarenNettyServer nettyServer;
 
     @Value("${zk.server}")
     String zkServer;
@@ -49,13 +48,17 @@ public class ServerBootStrap implements ApplicationListener<ContextRefreshedEven
 
             //注册本机ip
             zookeeperService.registryIp();
+
+            //启动netty
+            nettyServer.start();
         } catch (Exception e) {
             log.error("init server error.", e);
         }
     }
 
+
     private void joinLeaderElect() {
-        executor.submit(() -> {
+        ThreadUtil.newSingleThreadExecutor().submit(() -> {
             LeaderLatch leaderLatch = zookeeperService.getLeaderLatch();
             log.info("leaderLatch is leader:{}", leaderLatch.hasLeadership());
             try {
